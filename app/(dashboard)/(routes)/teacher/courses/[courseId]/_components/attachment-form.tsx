@@ -18,9 +18,7 @@ interface AttachmentFormProps {
 };
 
 const formSchema = z.object({
-  imageUrl: z.string().min(1, {
-    message: "Image is required",
-  }),
+  url: z.string().min(1),
 });
 
 export const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
@@ -32,7 +30,7 @@ export const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) =
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await axios.patch(`/api/courses/${courseId}`,values);
+      await axios.post(`/api/courses/${courseId}/attachments`,values);
       toast.success("Course updated");
       toggleEdit();
       router.refresh();
@@ -58,27 +56,24 @@ export const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) =
         </Button>
       </div>
       {!isEditing && (
-        !initialData.imageUrl ? (
-          <div className="flex items-center justify-center h-60 bg-slate-200 rounded-md">
-            <ImageIcon className="h-10 w-10 text-slate-500"/>
-          </div>
-        ) : (
-          <div className="relative aspect-video mt-2 ">
-            <Image alt="upload" className="object-cover rounded-md" fill src={initialData.imageUrl}/>
-          </div>
-        )
+          <>
+            {initialData.attachments.length === 0 && (
+              <p className="text-sm mt-2 text-slate-500 italic">No attachments yet.</p>
+            )}
+          </>
+        
       )}
       {isEditing && (
         <div>
           <FileUpload 
-            endpoint="courseImage"
+            endpoint="courseAttachment"
             onChange={(url) => {
               if(url) {
-                onSubmit({imageUrl: url});
+                onSubmit({url: url});
               }
             }} />
           <div className="text-xs text-muted-foreground mt-4 text-right">
-            16:9 aspect ratio recommended
+            Add anything your students might need to complete the course.
           </div>
         </div>
       )}
