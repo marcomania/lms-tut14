@@ -12,6 +12,8 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - app-network
+    ports:
+      - '3306:3306'
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     restart: always
